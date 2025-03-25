@@ -19,21 +19,18 @@ FOREIGN KEY (cliente_id) REFERENCES Clientes(id)
 CREATE TABLE UbicacionCliente (
 id INT PRIMARY KEY AUTO_INCREMENT,
 cliente_id INT,
-direccion VARCHAR(255),
+direccion VARCHAR(100),
 ciudad VARCHAR(100),
-estado VARCHAR(50),
+departamento VARCHAR(50),
 codigo_postal VARCHAR(10),
 pais VARCHAR(50),
 FOREIGN KEY (cliente_id) REFERENCES Clientes(id)
 );
-
---Tabla Puestos
-
+-- Tabla Puestos
 CREATE TABLE Puestos (
 id INT AUTO_INCREMENT PRIMARY KEY,
 nombre_puesto VARCHAR(50)
 );
-
 
 -- Tabla Empleados
 CREATE TABLE Empleados (
@@ -66,6 +63,7 @@ proveedor_id INT,
 nombre_contacto VARCHAR(100),
 telefono VARCHAR(20),
 direccion VARCHAR(100),
+ciudad VARCHAR(50),
 FOREIGN KEY (proveedor_id) REFERENCES Proveedores(id)
 );
 
@@ -84,6 +82,7 @@ nombre VARCHAR(100),
 precio DECIMAL(10, 2),
 proveedor_id INT,
 tipo_id INT,
+stock INT DEFAULT 10,
 FOREIGN KEY (proveedor_id) REFERENCES Proveedores(id),
 FOREIGN KEY (tipo_id) REFERENCES TiposProductosJerarquia(id)
 );
@@ -138,36 +137,51 @@ FOREIGN KEY (ubicacion_id) REFERENCES Ubicaciones(id)
 );
 
 
+-- Insertar Clientes
 INSERT INTO Clientes (nombre, email) VALUES
 ('Juan Pérez', 'juan.perez@email.com'),
 ('María Gómez', 'maria.gomez@email.com'),
-('Carlos Ruiz', 'carlos.ruiz@email.com');
+('Carlos Ruiz', 'carlos.ruiz@email.com'),
+('Ana Torres', 'ana.torres@email.com'),
+('Luis Fernández', 'luis.fernandez@email.com');
 
-
-INSERT INTO UbicacionCliente (cliente_id, direccion, ciudad, estado, codigo_postal, pais) VALUES
+-- Insertar Ubicaciones de Clientes (Luis Fernández ahora está en Medellín)
+INSERT INTO UbicacionCliente (cliente_id, direccion, ciudad, departamento, codigo_postal, pais) VALUES
 (1, 'Calle 123', 'Bogotá', 'Cundinamarca', '110111', 'Colombia'),
-(2, 'Av. Central 456', 'Medellín', 'Antioquia', '050022', 'Colombia');
--- Cliente 3 aún no tiene dirección
+(2, 'Av. Central 456', 'Medellín', 'Antioquia', '050022', 'Colombia'),
+(4, 'Carrera 7 #50-20', 'Cali', 'Valle del Cauca', '760010', 'Colombia'),
+(5, 'Carrera 45 #12-34', 'Medellín', 'Antioquia', '050023', 'Colombia'); -- Nueva ubicación para Luis Fernández
 
+-- Insertar Puestos de Empleados
 INSERT INTO Puestos (nombre_puesto) VALUES
 ('Vendedor'),
 ('Administrador'),
-('Asistente');
+('Asistente'),
+('Gerente');
 
+-- Insertar Empleados (Corrección: Se agregó la coma que faltaba antes de 'Sofía Ramírez')
 INSERT INTO Empleados (nombre, puesto_id, salario, fecha_contratacion) VALUES
 ('Laura Sánchez', 1, 2000.00, '2023-01-15'),
 ('Andrés Torres', 2, 3000.00, '2022-05-20'),
-('Lucía Martínez', 3, 1800.00, '2024-02-10');
+('Lucía Martínez', 3, 1800.00, '2024-02-10'),
+('Pedro Ramírez', 4, 5000.00, '2021-07-05'),
+('Sofía Ramírez', 3, 1900.00, '2025-04-01');
 
+-- Insertar Proveedores
 INSERT INTO Proveedores (nombre) VALUES
 ('Proveedor A'),
-('Proveedor B');
+('Proveedor B'),
+('Proveedor C'),
+('Proveedor D');
 
-INSERT INTO ContactoProveedores (proveedor_id, nombre_contacto, telefono, direccion) VALUES
-(1, 'Ana López', '3210001111', 'Cra 10 #45-30'),
-(2, 'Pedro Jiménez', '3201112222', 'Av. 9 #33-21');
+-- Insertar Contacto de Proveedores (Proveedor B ahora está en Medellín)
+INSERT INTO ContactoProveedores (proveedor_id, nombre_contacto, telefono, direccion, ciudad) VALUES
+(1, 'Ana López', '3210001111', 'Cra 10 #45-30', 'Bogotá'),
+(2, 'Pedro Jiménez', '3201112222', 'Av. 9 #33-21', 'Medellín'),
+(3, 'Luis Fernández', '3102233445', 'Calle 5 #10-22', 'Cali'),
+(4, 'Elena Ríos', '3156677889', 'Av. Libertad 100', 'Barranquilla');
 
-
+-- Insertar Categorías de Productos
 INSERT INTO TiposProductosJerarquia (tipo_nombre, descripcion, tipo_padre_id) VALUES
 ('Electrónica', 'Dispositivos electrónicos', NULL),
 ('Computadoras', 'Laptops y PCs', 1),
@@ -176,19 +190,34 @@ INSERT INTO TiposProductosJerarquia (tipo_nombre, descripcion, tipo_padre_id) VA
 ('Hombre', 'Ropa para hombre', 4),
 ('Mujer', 'Ropa para mujer', 4);
 
+-- Insertar Productos 
+INSERT INTO Productos (nombre, precio, proveedor_id, tipo_id, stock) VALUES
+('Laptop', 2500.00, 1, 2, 15),
+('Mouse', 50.00, 2, 3, 30),
+('Teclado', 80.00, 2, 3, 25),
+('Monitor 27"', 300.00, 3, 1, 10),
+('Disco SSD 512GB', 110.00, 3, 1, 20),
+('Cable HDMI', 15.00, 4, 3, 50),
+('Soporte para Laptop', 25.00, 4, 3, 30),
+('Lámpara LED USB', 10.00, 4, 3, 20);
 
-INSERT INTO Productos (nombre, precio, proveedor_id, tipo_id) VALUES
-('Laptop', 2500.00, 1, 1),
-('Mouse', 50.00, 2, 2),
-('Teclado', 80.00, 2, 2);
-
--- Suponiendo que ya agregaste columna empleado_id como mencionamos antes
+-- Insertar Pedidos
 INSERT INTO Pedidos (cliente_id, fecha, total, empleado_id) VALUES
 (1, '2025-03-01', 2630.00, 1),
-(2, '2025-03-10', 130.00, 2);
+(2, '2025-03-10', 130.00, 2),
+(3, '2025-03-15', 90.00, 3),
+(4, '2025-03-20', 80.00, 4),
+(1, '2025-03-22', 150.00, 2),
+(1, '2025-03-23', 200.00, 3);
 
+-- Insertar Detalles de Pedidos
 INSERT INTO DetallesPedido (pedido_id, producto_id, cantidad, precio_unitario) VALUES
 (1, 1, 1, 2500.00), -- 1 Laptop
-(1, 2, 1, 50.00),   -- 1 Mouse
-(2, 3, 1, 80.00);   -- 1 Teclado
+(1, 2, 6, 50.00),   -- 1 Mouse
+(2, 3, 1, 80.00),   -- 1 Teclado
+(3, 4, 1, 300.00),  -- 1 Monitor 27"
+(3, 5, 2, 110.00),  -- 2 Discos SSD 512GB
+(4, 6, 3, 15.00),   -- 3 Cables HDMI
+(4, 7, 1, 25.00);   -- 1 Soporte para Laptop
+
 
